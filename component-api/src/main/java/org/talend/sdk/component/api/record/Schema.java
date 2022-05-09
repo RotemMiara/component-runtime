@@ -32,9 +32,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.BiConsumer;
-import java.util.function.Supplier;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -611,12 +610,11 @@ public interface Schema {
     }
 
     static Schema.Entry avoidCollision(final Schema.Entry newEntry,
-            final Supplier<Stream<Schema.Entry>> allEntriesSupplier, final BiConsumer<String, Entry> replaceFunction) {
-        final Optional<Entry> collisionedEntry = allEntriesSupplier //
-                .get() //
-                .filter((final Entry field) -> field.getName().equals(newEntry.getName())
-                        && !Objects.equals(field, newEntry)) //
-                .findFirst();
+            final Function<String, Entry> allEntriesSupplier,
+            final BiConsumer<String, Entry> replaceFunction) {
+        final Optional<Entry> collisionedEntry = Optional.ofNullable(allEntriesSupplier //
+                .apply(newEntry.getName())) //
+                .filter((final Entry field) -> !Objects.equals(field, newEntry));
         if (!collisionedEntry.isPresent()) {
             // No collision, return new entry.
             return newEntry;
@@ -635,11 +633,7 @@ public interface Schema {
         final String baseName = Schema.sanitizeConnectionName(fieldToChange.getRawName()); // recalc primiti name.
 
         String newName = baseName + "_" + indexForAnticollision;
-        final Set<String> existingNames = allEntriesSupplier //
-                .get() //
-                .map(Entry::getName) //
-                .collect(Collectors.toSet());
-        while (existingNames.contains(newName)) {
+        while (allEntriesSupplier.apply(newName) != null) {
             indexForAnticollision++;
             newName = baseName + "_" + indexForAnticollision;
         }

@@ -191,7 +191,12 @@ public class SchemaImpl implements Schema {
             if (type != Type.RECORD) {
                 throw new IllegalArgumentException("entry is only valid for RECORD type of schema");
             }
-            final Entry entryToAdd = Schema.avoidCollision(entry, this::getAllEntries, this::replaceEntry);
+            final Entry entryToAdd = Schema.avoidCollision(entry,
+                    (String name) -> this.getAllEntries()
+                            .filter((Entry e) -> name.equals(e.getName()))
+                            .findFirst()
+                            .orElse(null),
+                    this::replaceEntry);
             if (entryToAdd == null) {
                 // mean try to add entry with same name.
                 throw new IllegalArgumentException("Entry with name " + entry.getName() + " already exist in schema");

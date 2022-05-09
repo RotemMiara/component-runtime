@@ -421,7 +421,7 @@ class RecordBuilderImplTest {
         final Entry entry = newEntry("field2", "newFieldName", Type.STRING, true, 5, "Comment");
         builder.updateEntryByName("field1", entry);
         Assertions.assertEquals(2, builder.getCurrentEntries().size());
-        assertTrue(entries
+        assertTrue(builder.getCurrentEntries()
                 .stream()
                 .anyMatch((Entry e) -> "field2".equals(e.getName()) && "newFieldName".equals(e.getRawName())));
         assertEquals("Hello", builder.getValue("field2"));

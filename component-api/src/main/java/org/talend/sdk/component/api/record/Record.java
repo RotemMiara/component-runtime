@@ -279,6 +279,14 @@ public interface Record {
 
         List<Entry> getCurrentEntries();
 
+        default Entry getEntry(final String name) {
+            return this.getCurrentEntries()
+                    .stream()
+                    .filter((Entry e) -> name.equals(e.getName()))
+                    .findFirst()
+                    .orElse(null);
+        }
+
         /**
          * Mark that next entry created {@code withXXXX()} will be before {@code entryName} in schema order.
          *
