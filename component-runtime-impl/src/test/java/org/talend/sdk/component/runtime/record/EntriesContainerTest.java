@@ -29,7 +29,7 @@ class EntriesContainerTest {
     @Test
     void t1() {
         RecordBuilderFactory factory = new RecordBuilderFactoryImpl("test");
-        RecordImpl.EntriesContainer container = new RecordImpl.EntriesContainer(Collections.emptyList());
+        EntriesContainer container = new EntriesContainer(Collections.emptyList());
 
         Schema.Entry f1 = factory.newEntryBuilder().withName("f1").withType(Schema.Type.STRING).build();
         Schema.Entry f2 = factory.newEntryBuilder().withName("f2").withType(Schema.Type.STRING).build();
@@ -73,7 +73,7 @@ class EntriesContainerTest {
         Assertions.assertEquals("f4,f3,f1Bis,f5,f2", this.reduce(container));
     }
 
-    private String reduce(RecordImpl.EntriesContainer container) {
+    private String reduce(EntriesContainer container) {
         return container.getEntries().map(Schema.Entry::getName).collect(Collectors.joining(","));
     }
 

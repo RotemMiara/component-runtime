@@ -63,8 +63,8 @@ public class SchemaImpl implements Schema {
     SchemaImpl(final SchemaImpl.BuilderImpl builder) {
         this.type = builder.type;
         this.elementSchema = builder.elementSchema;
-        this.entries = unmodifiableList(builder.entries);
-        this.metadataEntries = unmodifiableList(builder.metadataEntries);
+        this.entries = unmodifiableList(builder.entries.getEntries().collect(toList()));
+        this.metadataEntries = unmodifiableList(builder.metadataEntries.getEntries().collect(toList()));
         this.props = builder.props;
         entriesOrder = EntriesOrder.of(getFieldsOrder());
     }
@@ -163,9 +163,9 @@ public class SchemaImpl implements Schema {
 
         private Schema elementSchema;
 
-        private final List<Entry> entries = new ArrayList<>();
+        private final EntriesContainer entries = new EntriesContainer();
 
-        private final List<Entry> metadataEntries = new ArrayList<>();
+        private final EntriesContainer metadataEntries = new EntriesContainer();
 
         private Map<String, String> props = new LinkedHashMap<>(0);
 
@@ -192,19 +192,16 @@ public class SchemaImpl implements Schema {
                 throw new IllegalArgumentException("entry is only valid for RECORD type of schema");
             }
             final Entry entryToAdd = Schema.avoidCollision(entry,
-                    (String name) -> this.getAllEntries()
-                            .filter((Entry e) -> name.equals(e.getName()))
-                            .findFirst()
-                            .orElse(null),
+                    this::getEntry,
                     this::replaceEntry);
             if (entryToAdd == null) {
                 // mean try to add entry with same name.
                 throw new IllegalArgumentException("Entry with name " + entry.getName() + " already exist in schema");
             }
             if (entry.isMetadata()) {
-                this.metadataEntries.add(entryToAdd);
+                this.metadataEntries.addEntry(entryToAdd);
             } else {
-                this.entries.add(entryToAdd);
+                this.entries.addEntry(entryToAdd);
             }
 
             entriesOrder.add(entry.getName());
@@ -224,25 +221,15 @@ public class SchemaImpl implements Schema {
         }
 
         private void replaceEntry(final String name, final Schema.Entry entry) {
-            boolean fromEntries = this.replaceEntryFrom(this.entries, name, entry);
-            if (!fromEntries) {
-                this.replaceEntryFrom(this.metadataEntries, name, entry);
+            if (this.entries.getEntry(entry.getName()) != null) {
+                this.entries.replaceEntry(name, entry);
+            } else if (this.metadataEntries.getEntry(name) != null) {
+                this.metadataEntries.replaceEntry(name, entry);
             }
-        }
-
-        private boolean replaceEntryFrom(final List<Entry> currentEntries, final String entryName,
-                final Schema.Entry entry) {
-            for (int index = 0; index < currentEntries.size(); index++) {
-                if (Objects.equals(entryName, currentEntries.get(index).getName())) {
-                    currentEntries.set(index, entry);
-                    return true;
-                }
-            }
-            return false;
         }
 
         private Stream<Entry> getAllEntries() {
-            return Stream.concat(this.entries.stream(), this.metadataEntries.stream());
+            return Stream.concat(this.entries.getEntries(), this.metadataEntries.getEntries());
         }
 
         @Override
@@ -261,25 +248,25 @@ public class SchemaImpl implements Schema {
 
         @Override
         public Builder remove(final String name) {
-            final Entry entry = Stream
-                    .concat(entries.stream(), metadataEntries.stream())
-                    .filter(e -> name.equals(e.getName()))
-                    .findFirst()
-                    .get();
+            final Entry entry = this.getEntry(name);
             if (entry == null) {
                 throw new IllegalArgumentException(String.format("%s not in schema", name));
             }
-            return remove(entry);
+            return this.remove(entry);
         }
 
         @Override
         public Builder remove(final Entry entry) {
-            if (entry.isMetadata()) {
-                metadataEntries.remove(entry);
-            } else {
-                entries.remove(entry);
+            if (entry != null) {
+                if (entry.isMetadata()) {
+                    if (this.metadataEntries.getEntry(entry.getName()) != null) {
+                        metadataEntries.removeEntry(entry);
+                    }
+                } else if (this.entries.getEntry(entry.getName()) != null) {
+                    entries.removeEntry(entry);
+                }
+                entriesOrder.remove(entry.getName());
             }
-            entriesOrder.remove(entry.getName());
             return this;
         }
 
@@ -322,10 +309,18 @@ public class SchemaImpl implements Schema {
 
         @Override
         public Schema build(final Comparator<Entry> order) {
-            final String entriesOrder = entries.stream().sorted(order).map(Entry::getName).collect(joining(","));
+            final String entriesOrder = this.getAllEntries().sorted(order).map(Entry::getName).collect(joining(","));
             this.props.put(ENTRIES_ORDER_PROP, entriesOrder);
 
             return new SchemaImpl(this);
+        }
+
+        private Schema.Entry getEntry(final String name) {
+            Entry entry = this.entries.getEntry(name);
+            if (entry == null) {
+                entry = this.metadataEntries.getEntry(name);
+            }
+            return entry;
         }
     }
 
