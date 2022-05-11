@@ -618,7 +618,7 @@ class RecordBuilderImplTest {
                 .moveAfter("_20", "_25")
                 .swap("_53", "_55");
         assertEquals("_00,_10,_20,_25,_30,_40,_50,_53,_55", order.toFields());
-        final Record record = new RecordImpl.BuilderImpl(schema.toBuilder().build(order.get()))
+        final Record record = new RecordImpl.BuilderImpl(schema.toBuilder().build(order))
                 .withString("_10", "10")
                 .withString("_20", "20")
                 .withString("_30", "30")
@@ -651,7 +651,7 @@ class RecordBuilderImplTest {
         Collections.reverse(newOrder);
         assertEquals("_55,_53,_50,_40,_30,_25,_20,_10,_00", newOrder.stream().collect(joining(",")));
         //
-        final Schema newSchemaBis = newSchema.toBuilder().build(EntriesOrder.of(newOrder).get());
+        final Schema newSchemaBis = newSchema.toBuilder().build(EntriesOrder.of(newOrder));
         assertEquals("_55,_53,_50,_40,_30,_25,_60,_56", getSchemaFields(newSchemaBis));
         assertEquals("_55,_53,_50,_40,_30,_25,_60,_56", newSchemaBis.naturalOrder().toFields());
         //

@@ -455,7 +455,7 @@ class SchemaImplTest {
     }
 
     private String getSchemaFields(final Schema schema, final EntriesOrder entriesOrder) {
-        return schema.getEntriesOrdered(entriesOrder.get()).stream().map(e -> e.getName()).collect(joining(","));
+        return schema.getEntriesOrdered(entriesOrder).stream().map(e -> e.getName()).collect(joining(","));
     }
 
     private String getSchemaFields(final Schema schema, final Comparator<Entry> entriesOrder) {

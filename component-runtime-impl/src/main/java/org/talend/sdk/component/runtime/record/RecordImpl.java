@@ -565,7 +565,7 @@ public final class RecordImpl implements Record {
             public Comparator<Entry> buildComparator() {
                 final List<String> orderedFields =
                         this.orderedEntries.getEntries().map(Entry::getName).collect(Collectors.toList());
-                return EntriesOrder.of(orderedFields).get();
+                return EntriesOrder.of(orderedFields);
             }
         }
     }

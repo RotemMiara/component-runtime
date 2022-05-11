@@ -87,7 +87,7 @@ public interface Schema {
      * @return all entries ordered
      */
     default List<Entry> getEntriesOrdered() {
-        return getEntriesOrdered(naturalOrder().get());
+        return getEntriesOrdered(naturalOrder());
     }
 
     /**
@@ -501,7 +501,7 @@ public interface Schema {
     @RequiredArgsConstructor
     @ToString
     @EqualsAndHashCode
-    class EntriesOrder implements Supplier<Comparator<Entry>> {
+    class EntriesOrder implements Comparator<Entry> {
 
         private final OrderedMap<String> fieldsOrder;
 
@@ -590,8 +590,7 @@ public interface Schema {
             return this.fieldsOrder.getEntries().collect(Collectors.joining(","));
         }
 
-        @Override
-        public Comparator<Entry> get() {
+        public Comparator<Entry> getComparator() {
             if (this.currentComparator == null) {
                 final Map<String, Integer> entryPositions = new HashMap<>();
                 final AtomicInteger index = new AtomicInteger(1);
@@ -601,6 +600,11 @@ public interface Schema {
                 this.currentComparator = new EntryComparator(entryPositions);
             }
             return this.currentComparator;
+        }
+
+        @Override
+        public int compare(final Entry e1, final Entry e2) {
+            return this.getComparator().compare(e1, e2);
         }
 
         @RequiredArgsConstructor
@@ -629,8 +633,8 @@ public interface Schema {
     // use new avoid collision with entry getter.
     @Deprecated
     static Schema.Entry avoidCollision(final Schema.Entry newEntry,
-                                       final Supplier<Stream<Schema.Entry>> allEntriesSupplier,
-                                       final BiConsumer<String, Entry> replaceFunction) {
+            final Supplier<Stream<Schema.Entry>> allEntriesSupplier,
+            final BiConsumer<String, Entry> replaceFunction) {
         final Function<String, Entry> entryGetter = (String name) -> allEntriesSupplier //
                 .get() //
                 .filter((final Entry field) -> field.getName().equals(name))

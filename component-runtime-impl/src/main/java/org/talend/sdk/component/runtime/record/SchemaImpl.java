@@ -140,7 +140,7 @@ public class SchemaImpl implements Schema {
 
     @JsonbTransient
     public List<Entry> getEntriesOrdered() {
-        return getAllEntries().sorted(entriesOrder.get()).collect(toList());
+        return getAllEntries().sorted(entriesOrder).collect(toList());
     }
 
     @Override
