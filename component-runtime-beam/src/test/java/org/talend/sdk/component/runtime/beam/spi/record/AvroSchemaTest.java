@@ -257,7 +257,7 @@ class AvroSchemaTest {
 
     private String getSchemaFields(final org.talend.sdk.component.api.record.Schema schema,
             final EntriesOrder entriesOrder) {
-        return schema.getEntriesOrdered(entriesOrder).stream().map(e -> e.getName()).collect(joining(","));
+        return schema.getEntriesOrdered(entriesOrder.get()).stream().map(e -> e.getName()).collect(joining(","));
     }
 
     private org.talend.sdk.component.api.record.Schema.Entry.Builder newEntry(final String name,

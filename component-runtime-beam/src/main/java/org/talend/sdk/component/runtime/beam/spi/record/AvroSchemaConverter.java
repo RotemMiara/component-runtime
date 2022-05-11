@@ -38,7 +38,7 @@ public class AvroSchemaConverter {
 
     public AvroSchema convert(final SchemaImpl schema) {
         final Schema.EntriesOrder eo = Schema.EntriesOrder.of(schema.getProp(ENTRIES_ORDER_PROP));
-        final List<org.apache.avro.Schema.Field> fields = schema.getAllEntries().sorted(eo).map(entry -> {
+        final List<org.apache.avro.Schema.Field> fields = schema.getAllEntries().sorted(eo.get()).map(entry -> {
             final org.apache.avro.Schema avroSchema = toSchema(entry);
             final org.apache.avro.Schema.Field f = AvroSchemaBuilder.AvroHelper.toField(avroSchema, entry);
             return f;

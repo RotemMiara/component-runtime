@@ -85,6 +85,7 @@ class SchemaImplTest {
                 .suppress(Warning.STRICT_HASHCODE) // Supress test hashcode use all fields used by equals (for legacy)
                 .forClass(SchemaImpl.class)
                 .withPrefabValues(Schema.Entry.class, first, second)
+                .withPrefabValues(EntriesOrder.class, EntriesOrder.of("First"), EntriesOrder.of("Second"))
                 .verify();
     }
 
@@ -454,7 +455,7 @@ class SchemaImplTest {
     }
 
     private String getSchemaFields(final Schema schema, final EntriesOrder entriesOrder) {
-        return schema.getEntriesOrdered(entriesOrder).stream().map(e -> e.getName()).collect(joining(","));
+        return schema.getEntriesOrdered(entriesOrder.get()).stream().map(e -> e.getName()).collect(joining(","));
     }
 
     private String getSchemaFields(final Schema schema, final Comparator<Entry> entriesOrder) {

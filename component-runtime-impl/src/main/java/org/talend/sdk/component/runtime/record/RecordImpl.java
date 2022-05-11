@@ -52,6 +52,7 @@ import javax.json.bind.annotation.JsonbTransient;
 import javax.json.bind.config.PropertyOrderStrategy;
 import javax.json.spi.JsonProvider;
 
+import org.talend.sdk.component.api.record.OrderedMap;
 import org.talend.sdk.component.api.record.Record;
 import org.talend.sdk.component.api.record.Schema;
 import org.talend.sdk.component.api.record.Schema.EntriesOrder;
@@ -117,7 +118,7 @@ public final class RecordImpl implements Record {
 
         private final Map<String, Object> values = new HashMap<>(8);
 
-        private final EntriesContainer entries;
+        private final OrderedMap<Schema.Entry> entries;
 
         private final Schema providedSchema;
 
@@ -130,13 +131,12 @@ public final class RecordImpl implements Record {
         public BuilderImpl(final Schema providedSchema) {
             this.providedSchema = providedSchema;
             if (this.providedSchema == null) {
-                this.entries = new EntriesContainer(Collections.emptyList());
+                this.entries = new OrderedMap<>(Schema.Entry::getName, Collections.emptyList());
                 this.orderState = new OrderState(Collections.emptyList());
             } else {
                 this.entries = null;
                 final List<Entry> fields = providedSchema.naturalOrder()
                         .getFieldsOrder()
-                        .stream()
                         .map(providedSchema::getEntry)
                         .collect(Collectors.toList());
                 this.orderState = new OrderState(fields);
@@ -145,7 +145,7 @@ public final class RecordImpl implements Record {
 
         private BuilderImpl(final List<Schema.Entry> entries, final Map<String, Object> values) {
             this.providedSchema = null;
-            this.entries = new EntriesContainer(entries);
+            this.entries = new OrderedMap<>(Schema.Entry::getName, entries);
             this.values.putAll(values);
             this.orderState = null;
         }
@@ -511,10 +511,10 @@ public final class RecordImpl implements Record {
             // flag if providedSchema's entriesOrder was altered
             private boolean override = false;
 
-            private final EntriesContainer orderedEntries;
+            private final OrderedMap<Schema.Entry> orderedEntries;
 
             public OrderState(final Iterable<Schema.Entry> orderedEntries) {
-                this.orderedEntries = new EntriesContainer(orderedEntries);
+                this.orderedEntries = new OrderedMap<>(Schema.Entry::getName, orderedEntries);
             }
 
             public void before(final String entryName) {
@@ -565,7 +565,7 @@ public final class RecordImpl implements Record {
             public Comparator<Entry> buildComparator() {
                 final List<String> orderedFields =
                         this.orderedEntries.getEntries().map(Entry::getName).collect(Collectors.toList());
-                return EntriesOrder.of(orderedFields);
+                return EntriesOrder.of(orderedFields).get();
             }
         }
     }

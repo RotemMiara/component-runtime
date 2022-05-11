@@ -31,6 +31,7 @@ import java.util.stream.Stream;
 
 import javax.json.bind.annotation.JsonbTransient;
 
+import org.talend.sdk.component.api.record.OrderedMap;
 import org.talend.sdk.component.api.record.Schema;
 
 import lombok.EqualsAndHashCode;
@@ -139,7 +140,7 @@ public class SchemaImpl implements Schema {
 
     @JsonbTransient
     public List<Entry> getEntriesOrdered() {
-        return getAllEntries().sorted(entriesOrder).collect(toList());
+        return getAllEntries().sorted(entriesOrder.get()).collect(toList());
     }
 
     @Override
@@ -163,9 +164,9 @@ public class SchemaImpl implements Schema {
 
         private Schema elementSchema;
 
-        private final EntriesContainer entries = new EntriesContainer();
+        private final OrderedMap<Schema.Entry> entries = new OrderedMap<>(Schema.Entry::getName);
 
-        private final EntriesContainer metadataEntries = new EntriesContainer();
+        private final OrderedMap<Schema.Entry> metadataEntries = new OrderedMap<>(Schema.Entry::getName);
 
         private Map<String, String> props = new LinkedHashMap<>(0);
 

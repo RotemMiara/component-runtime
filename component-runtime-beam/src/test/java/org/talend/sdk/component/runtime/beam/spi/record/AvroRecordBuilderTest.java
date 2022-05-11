@@ -37,6 +37,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import javax.json.Json;
 import javax.json.JsonArray;
@@ -358,7 +359,7 @@ class AvroRecordBuilderTest {
                 .moveAfter("_20", "_25")
                 .swap("_53", "_55");
         assertEquals("_00,_10,_20,_25,_30,_40,_50,_53,_55", order.toFields());
-        final Record record = factory.newRecordBuilder(schema.toBuilder().build(order))
+        final Record record = factory.newRecordBuilder(schema.toBuilder().build(order.get()))
                 .withString("_10", "10")
                 .withString("_20", "20")
                 .withString("_30", "30")
@@ -386,12 +387,12 @@ class AvroRecordBuilderTest {
         assertEquals("_25,_53,_30,_40,_50,_55,_60,_56", getSchemaFields(newSchema));
         assertEquals("_25,_53,_30,_40,_50,_55,_60,_56", newSchema.naturalOrder().toFields());
         // provide an order w/ obsolete/missing entries
-        final List<String> newOrder = record.getSchema().naturalOrder().getFieldsOrder();
+        final List<String> newOrder = record.getSchema().naturalOrder().getFieldsOrder().collect(Collectors.toList());
         Collections.sort(newOrder);
         Collections.reverse(newOrder);
         assertEquals("_55,_53,_50,_40,_30,_25,_20,_10,_00", newOrder.stream().collect(joining(",")));
         //
-        final Schema newSchemaBis = newSchema.toBuilder().build(EntriesOrder.of(newOrder));
+        final Schema newSchemaBis = newSchema.toBuilder().build(EntriesOrder.of(newOrder).get());
         assertEquals("_55,_53,_50,_40,_30,_25,_60,_56", getSchemaFields(newSchemaBis));
         assertEquals("_55,_53,_50,_40,_30,_25,_60,_56", newSchemaBis.naturalOrder().toFields());
         //

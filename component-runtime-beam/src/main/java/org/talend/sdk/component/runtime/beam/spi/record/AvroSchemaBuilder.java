@@ -31,12 +31,12 @@ import java.util.stream.Collectors;
 import org.apache.avro.LogicalTypes;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.Schema.Type;
+import org.talend.sdk.component.api.record.OrderedMap;
 import org.talend.sdk.component.api.record.Schema;
 import org.talend.sdk.component.api.record.Schema.Builder;
 import org.talend.sdk.component.api.record.Schema.Entry;
 import org.talend.sdk.component.runtime.beam.avro.AvroSchemas;
 import org.talend.sdk.component.runtime.manager.service.api.Unwrappable;
-import org.talend.sdk.component.runtime.record.EntriesContainer;
 
 public class AvroSchemaBuilder implements Schema.Builder {
 
@@ -102,7 +102,7 @@ public class AvroSchemaBuilder implements Schema.Builder {
     private static final AvroSchema BOOLEAN_SCHEMA_NULLABLE = new AvroSchema(org.apache.avro.Schema
             .createUnion(asList(NULL_SCHEMA, org.apache.avro.Schema.create(org.apache.avro.Schema.Type.BOOLEAN))));
 
-    private EntriesContainer fields;
+    private OrderedMap<Schema.Entry> fields;
 
     private Schema.Type type;
 
@@ -122,7 +122,7 @@ public class AvroSchemaBuilder implements Schema.Builder {
             throw new IllegalArgumentException("entry is only valid for RECORD type of schema");
         }
         if (fields == null) {
-            fields = new EntriesContainer(Collections.singletonList(entry));
+            fields = new OrderedMap<>(Schema.Entry::getName, Collections.singletonList(entry));
         }
 
         final Schema.Entry realEntry = Schema.avoidCollision(entry, fields::getEntry, fields::replaceEntry);

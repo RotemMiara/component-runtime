@@ -21,15 +21,16 @@ import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.talend.sdk.component.api.record.OrderedMap;
 import org.talend.sdk.component.api.record.Schema;
 import org.talend.sdk.component.api.service.record.RecordBuilderFactory;
 
-class EntriesContainerTest {
+class OrderedMapTest {
 
     @Test
     void t1() {
         RecordBuilderFactory factory = new RecordBuilderFactoryImpl("test");
-        EntriesContainer container = new EntriesContainer(Collections.emptyList());
+        OrderedMap<Schema.Entry> container = new OrderedMap<>(Schema.Entry::getName, Collections.emptyList());
 
         Schema.Entry f1 = factory.newEntryBuilder().withName("f1").withType(Schema.Type.STRING).build();
         Schema.Entry f2 = factory.newEntryBuilder().withName("f2").withType(Schema.Type.STRING).build();
@@ -73,7 +74,7 @@ class EntriesContainerTest {
         Assertions.assertEquals("f4,f3,f1Bis,f5,f2", this.reduce(container));
     }
 
-    private String reduce(EntriesContainer container) {
+    private String reduce(OrderedMap<Schema.Entry> container) {
         return container.getEntries().map(Schema.Entry::getName).collect(Collectors.joining(","));
     }
 
