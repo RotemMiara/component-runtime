@@ -58,6 +58,10 @@ public interface Record {
      */
     <T> T get(Class<T> expectedType, String name);
 
+    default <T> T get(Class<T> expectedType, Schema.Entry entry) {
+        return this.get(expectedType, entry);
+    }
+
     /**
      * See {@link Record#get(Class, String)}.
      * 
