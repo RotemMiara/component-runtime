@@ -217,7 +217,7 @@
     <mvn-minimal.version>3.6.0</mvn-minimal.version>
     <maven-shared-utils.version>3.3.4</maven-shared-utils.version>
 
-    <beam.version>2.36.0</beam.version>
+    <beam.version>2.44.0</beam.version>
     <!-- should follow beam-sdk-java-core version -->
     <joda.time.version>2.10.10</joda.time.version>
 
@@ -822,7 +822,7 @@
             <windowtitle>${project.name}</windowtitle>
             <header>${project.name} - ${project.version}</header>
             <doctitle>${project.name} - ${project.version}</doctitle>
-            <bottom>${project.version} - Copyright &amp;copy; 2022 &lt;a href="https://talend.github.io/component-runtime/" target="_top"&gt;Talend Component Kit Documentation&lt;a&gt;</bottom>
+            <bottom>${project.version} - Copyright &amp;copy; 2022 &lt;a href="https://talend.github.io/component-runtime/" target="_top">Talend Component Kit Documentation&lt;a></bottom>
             <use>true</use>
           </configuration>
         </plugin>
