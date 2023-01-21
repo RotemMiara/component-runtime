@@ -170,7 +170,7 @@
 
     <!-- do not update without updating test-->
     <ziplock.test.version>7.0.5</ziplock.test.version>
-    <meecrowave.version>1.2.13</meecrowave.version>
+    <meecrowave.version>1.2.15</meecrowave.version>
     <owb.version>2.0.26</owb.version>
     <tomcat.version>9.0.62</tomcat.version>
     <cxf.version>3.5.1</cxf.version>
@@ -822,7 +822,7 @@
             <windowtitle>${project.name}</windowtitle>
             <header>${project.name} - ${project.version}</header>
             <doctitle>${project.name} - ${project.version}</doctitle>
-            <bottom>${project.version} - Copyright &amp;copy; 2022 &lt;a href="https://talend.github.io/component-runtime/" target="_top"&gt;Talend Component Kit Documentation&lt;a&gt;</bottom>
+            <bottom>${project.version} - Copyright &amp;copy; 2022 &lt;a href="https://talend.github.io/component-runtime/" target="_top">Talend Component Kit Documentation&lt;a></bottom>
             <use>true</use>
           </configuration>
         </plugin>
