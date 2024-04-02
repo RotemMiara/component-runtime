@@ -3,6 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "asciidoctor": "2.2.6"
+    "asciidoctor": "3.0.0"
   }
 }
